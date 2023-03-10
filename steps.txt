@@ -1,0 +1,64 @@
+# Install Django and TensorFlow
+!pip install django tensorflow
+
+# Create a Django project
+!django-admin startproject sentiment_api
+
+# Change to the project directory
+import os
+os.chdir("sentiment_api")
+
+# Create a Django app
+!python manage.py startapp sentiment
+
+# Add the following code to the settings.py file
+INSTALLED_APPS = [
+    ...
+    'sentiment',
+    ...
+]
+
+# Add the following code to the sentiment/models.py file
+from tensorflow.keras.models import load_model
+
+class SentimentModel:
+    def __init__(self):
+        self.tokenizer = transformers.BertTokenizer.from_pretrained("bert-base-uncased")
+        self.model = load_model("sentiment_model")
+
+    def predict_sentiment(self, text):
+        tokenized = self.tokenizer.encode(text, max_length=512, add_special_tokens=True)
+        padded = tf.keras.preprocessing.sequence.pad_sequences([tokenized], maxlen=512, padding="post", truncating="post")
+        logits = self.model.predict(padded)
+        sentiment = "positive" if logits[0][0] > 0.5 else "negative"
+        return sentiment
+
+# Add the following code to the sentiment/views.py file
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import SentimentModel
+
+sentiment_model = SentimentModel()
+
+def predict_sentiment(request):
+    text = request.GET.get("text")
+    sentiment = sentiment_model.predict_sentiment(text)
+    return JsonResponse({"sentiment": sentiment})
+
+# Add the following code to the sentiment/urls.py file
+from django.urls import path
+from .views import predict_sentiment
+
+urlpatterns = [
+    path('predict_sentiment/', predict_sentiment, name='predict_sentiment'),
+]
+
+# Add the following code to the sentiment_api/urls.py file
+from django.urls import include, path
+
+urlpatterns = [
+    path('sentiment/', include('sentiment.urls')),
+]
+
+# Start the Django development server
+!python manage.py runserver
