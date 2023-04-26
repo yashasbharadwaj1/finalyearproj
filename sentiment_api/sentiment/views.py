@@ -34,13 +34,36 @@ nts': 321, 'total_positive_comments': 254, 'total_negative_comments': 67, 'final
             """
             # return JsonResponse(data=my_dict, safe=False)
             c = {'output':my_dict}
-            return render(request, 'allverdicts.html', c)
+            #return render(request, 'allverdicts.html', c)
+            return JsonResponse(data=c)
         else:
             return JsonResponse(data={"stauts": status.HTTP_400_BAD_REQUEST})
     else:
         return JsonResponse(data={"status": "only get method allowed"})
 
 
+@api_view(["GET"])
+def allmovienames(request):
+    listofmoviesindb = get_movie_names()
+    context={"allmovies":listofmoviesindb}
+    return JsonResponse(data=context)
+@api_view(['GET', 'POST'])
+def filter_verdict_by_movie(request, name):
+    if request.method == "POST" or "GET":
+       results = Mymodelresults.objects.filter(movie=name)
+       serializer = ResultsSerializer(results, many=True)
+       ordered_dict = serializer.data
+       json_str = json.dumps(ordered_dict)
+       results_dict = json.loads(json_str)
+       return JsonResponse(data =results_dict,safe=False)
+
+
+
+
+
+
+
+"""
 @api_view(["GET", "POST"])
 def filter_verdict_by_movie(request):
     if request.method == "GET":
@@ -81,4 +104,10 @@ def filter_verdict_by_movie(request):
                 'verdict': particular_obj.final_verdict
             }
 
-            return render(request, 'filterbymovie.html', d)
+            return render(request, 'filterbymovieresults.html', d)
+"""
+
+"""
+def home(request):
+    return render(request,'home.html')
+"""

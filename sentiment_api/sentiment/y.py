@@ -13,13 +13,7 @@ from selenium.webdriver.support import expected_conditions as ec
 
 from selenium import webdriver
 
-# nltk imports
-"""
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-lemmatizer = WordNetLemmatizer()
-import re
-"""
+
 
 import time
 import pandas as pd
@@ -42,6 +36,7 @@ class SeleniumScraper:
         driver.implicitly_wait(0.5)
 
         driver.get(self.video_url)
+        # wait for 17 seconds
         wait = WebDriverWait(driver, 17)
         for item in range(17):
             wait.until(ec.visibility_of_element_located((By.TAG_NAME, "body"))).send_keys(Keys.END)
@@ -63,12 +58,4 @@ class SeleniumScraper:
         return my_df
 
 
-"""
-def insert_one_record():
-    mydict = {"channelname": "Tried and Refused Productions", "movie ": "Pathan",
-              "url": "https://www.youtube.com/watch?v=YjN6qgvk5KM",
-              "hero": "shah rukh khan", "heroine": "deepika", "industry": "Bollywood"}
-
-    x = mydata.insert_one(mydict)
-"""
 
